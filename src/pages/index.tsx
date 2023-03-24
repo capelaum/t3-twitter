@@ -7,6 +7,7 @@ import { api, type RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import { LoadingPage } from "~/components/LoadSpinner";
 
 dayjs.extend(relativeTime);
 
@@ -42,7 +43,7 @@ const PostView = (props: PostWithAuthor) => {
   const { post, author } = props;
 
   return (
-    <div className="flex items-center gap-3 border-b border-slate-400 p-4">
+    <div className="flex items-center gap-3 border-b border-slate-700 p-4">
       <Image
         src={author.profileImageUrl}
         alt={`@${author.username ?? "user"}'s profile picture`}
@@ -53,9 +54,9 @@ const PostView = (props: PostWithAuthor) => {
         blurDataURL={author.profileImageUrl}
       />
 
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1 text-slate-300">
-          <span className="font-semibold">{`@${
+          <span className="text-sm font-semibold">{`@${
             author.username ?? "user"
           } · `}</span>
           <span className="text-sm font-thin">
@@ -69,15 +70,30 @@ const PostView = (props: PostWithAuthor) => {
   );
 };
 
+const Feed = () => {
+  const { data, isLoading: postsIsLoading } = api.posts.getAll.useQuery();
+
+  if (postsIsLoading) return <LoadingPage />;
+
+  if (!data) return <div>Something went wrong...</div>;
+
+  return (
+    <div className="flex flex-col">
+      <div className="flex flex-col">
+        {data?.map((fullPost) => (
+          <PostView key={fullPost.post.id} {...fullPost} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Home: NextPage = () => {
-  const user = useUser();
-  console.log("💥 ~ user:", user);
+  const { isLoaded: userLoaded, isSignedIn } = useUser();
 
-  const { data, isLoading } = api.posts.getAll.useQuery();
+  api.posts.getAll.useQuery();
 
-  if (isLoading) return <div>Loading...</div>;
-
-  if (!data) return <div>Something went wrong</div>;
+  if (!userLoaded) return null;
 
   return (
     <>
@@ -88,8 +104,8 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex h-screen justify-center">
         <div className="h-full w-full border-x border-slate-700 md:max-w-2xl">
-          <div className="border-slate-499 flex items-center gap-4 border-b p-4">
-            {!user.isSignedIn && (
+          <div className="flex items-center gap-4 border-b border-slate-700 p-4">
+            {!isSignedIn && (
               <SignInButton mode="redirect">
                 <button className="flex justify-center rounded-md bg-slate-100 py-1 px-2 text-sm font-medium text-slate-900">
                   Sign in
@@ -105,14 +121,10 @@ const Home: NextPage = () => {
               </SignOutButton>
             )} */}
 
-            {!!user.isSignedIn && <CreatePostWizard />}
+            {!!isSignedIn && <CreatePostWizard />}
           </div>
 
-          <div className="flex flex-col">
-            {data?.map((fullPost) => (
-              <PostView key={fullPost.post.id} {...fullPost} />
-            ))}
-          </div>
+          <Feed />
         </div>
       </main>
     </>

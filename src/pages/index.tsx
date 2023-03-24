@@ -54,17 +54,17 @@ const PostView = (props: PostWithAuthor) => {
         blurDataURL={author.profileImageUrl}
       />
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <div className="flex items-center gap-1 text-slate-300">
-          <span className="text-sm font-semibold">{`@${
+          <span className="text-md font-semibold">{`@${
             author.username ?? "user"
           } · `}</span>
-          <span className="text-sm font-thin">
+          <span className="text-md font-thin">
             {dayjs(post.createdAt).fromNow()}
           </span>
         </div>
 
-        <p>{post.content}</p>
+        <p className="text-2xl">{post.content}</p>
       </div>
     </div>
   );

@@ -7,14 +7,44 @@ import { api, type RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import { useState, type FormEvent } from "react";
 import { LoadingPage } from "~/components/LoadSpinner";
 
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
+  const [input, setInput] = useState("");
+
   const { user } = useUser();
 
+  const ctx = api.useContext();
+
+  const { mutate: createPost, isLoading: isCreatingPost } =
+    api.posts.create.useMutation({
+      onSuccess: () => {
+        setInput("");
+
+        void ctx.posts.getAll.refetch();
+      },
+    });
+
   if (!user) return null;
+
+  const handleCreatePost = () => {
+    try {
+      createPost({
+        content: input,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    handleCreatePost();
+  };
 
   return (
     <div className="flex w-full items-center gap-3">
@@ -28,11 +58,32 @@ const CreatePostWizard = () => {
         blurDataURL={user.profileImageUrl}
       />
 
-      <input
-        type="text"
-        placeholder="Type some emojis!"
-        className="grow rounded-sm bg-transparent px-2 py-1 outline-none"
-      />
+      <form
+        onSubmit={handleOnSubmit}
+        className="gap-3w-full flex w-full items-center "
+      >
+        <input
+          type="text"
+          placeholder="Type some emojis!"
+          className="grow rounded-sm  bg-transparent px-2 py-1 outline-none"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleCreatePost();
+            }
+          }}
+          disabled={isCreatingPost}
+        />
+
+        <button
+          type="submit"
+          className="rounded-full bg-sky-500 px-5 py-1 font-semibold text-white"
+          disabled={isCreatingPost}
+        >
+          Post
+        </button>
+      </form>
     </div>
   );
 };

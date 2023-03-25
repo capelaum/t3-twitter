@@ -68,7 +68,7 @@ export const postsRouter = createTRPCRouter({
       z.object({
         content: z
           .string()
-          .emoji()
+          .emoji("Only emoji are allowed!")
           .min(1, {
             message: "Post must be at least 1 character long",
           })

@@ -8,7 +8,8 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { useState, type FormEvent } from "react";
-import { LoadingPage } from "~/components/LoadSpinner";
+import { toast } from "react-hot-toast";
+import { LoadingPage, LoadSpinner } from "~/components/LoadSpinner";
 
 dayjs.extend(relativeTime);
 
@@ -26,23 +27,28 @@ const CreatePostWizard = () => {
 
         void ctx.posts.getAll.refetch();
       },
+      onError: (e) => {
+        const errorMessage = e.data?.zodError?.fieldErrors.content;
+
+        if (errorMessage && errorMessage[0]) {
+          toast.error(errorMessage[0]);
+          return;
+        }
+
+        toast.error("Failed to post... Try again later.");
+      },
     });
 
   if (!user) return null;
 
   const handleCreatePost = () => {
-    try {
-      createPost({
-        content: input,
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    createPost({
+      content: input,
+    });
   };
 
   const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     handleCreatePost();
   };
 
@@ -71,13 +77,17 @@ const CreatePostWizard = () => {
           disabled={isCreatingPost}
         />
 
-        <button
-          type="submit"
-          className="rounded-full bg-sky-500 px-5 py-1 font-semibold text-white"
-          disabled={isCreatingPost}
-        >
-          Post
-        </button>
+        {isCreatingPost ? (
+          <LoadSpinner size={24} />
+        ) : (
+          <button
+            type="submit"
+            className="rounded-full bg-sky-500 px-5 py-1 font-semibold text-white"
+            disabled={isCreatingPost}
+          >
+            Post
+          </button>
+        )}
       </form>
     </div>
   );

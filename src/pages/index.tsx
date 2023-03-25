@@ -68,11 +68,6 @@ const CreatePostWizard = () => {
           className="grow rounded-sm  bg-transparent px-2 py-1 outline-none"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleCreatePost();
-            }
-          }}
           disabled={isCreatingPost}
         />
 

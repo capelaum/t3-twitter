@@ -19,13 +19,24 @@ const ProfilePage: NextPage<{ userId: string }> = ({ userId }) => {
         <title>T3 Twitter | {user.username}</title>
       </Head>
       <Layout>
-        <h1>{user.username}</h1>
+        <div className="relative h-36 bg-slate-800">
+          <Image
+            src={user.profileImageUrl}
+            alt={`${user.username}'s profile picture`}
+            width={128}
+            height={128}
+            className="absolute bottom-0 left-0 -mb-16 ml-4 rounded-full border-4 border-slate-900 bg-slate-900"
+          />
+        </div>
+        <div className="mt-20 pl-8 text-2xl font-bold">{`@${user.username}`}</div>
+        <div className="w-full border-b border-slate-700 pb-4"></div>
       </Layout>
     </>
   );
 };
 
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
+import Image from "next/image";
 import superjson from "superjson";
 import { Layout } from "~/components/Layout";
 import { LoadSpinner } from "~/components/LoadSpinner";

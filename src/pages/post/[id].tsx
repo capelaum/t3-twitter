@@ -5,7 +5,7 @@ const PostPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>T3 Twitter | Post</title>
+        <title>Post | T3 Twitter</title>
       </Head>
       <div className="flex min-h-screen justify-center">
         <h1>Post</h1>

@@ -37,7 +37,7 @@ const ProfilePage: NextPage<{ userId: string }> = ({ userId }) => {
   return (
     <>
       <Head>
-        <title>T3 Twitter | {user.username}</title>
+        <title>{`${user.username} | T3 Twitter`}</title>
       </Head>
       <Layout>
         <div className="relative h-36 bg-slate-800">

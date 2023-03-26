@@ -1,6 +1,27 @@
 import { type GetStaticProps, type NextPage } from "next";
 import Head from "next/head";
+import { LoadingPage } from "~/components/LoadSpinner";
 import { api } from "~/utils/api";
+
+const ProfileFeed = (props: { userId: string }) => {
+  const { data, isLoading } = api.posts.getPostsByUserId.useQuery({
+    userId: props.userId,
+  });
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  if (!data || data.length === 0) return <div>User has not posted...</div>;
+
+  return (
+    <div className="flex flex-col">
+      {data.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
+};
 
 const ProfilePage: NextPage<{ userId: string }> = ({ userId }) => {
   const { data: user, isLoading } = api.profile.getUserById.useQuery({
@@ -8,7 +29,7 @@ const ProfilePage: NextPage<{ userId: string }> = ({ userId }) => {
   });
 
   if (isLoading) {
-    <LoadSpinner />;
+    return <LoadingPage />;
   }
 
   if (!user) return <div>404</div>;
@@ -30,6 +51,7 @@ const ProfilePage: NextPage<{ userId: string }> = ({ userId }) => {
         </div>
         <div className="mt-20 pl-8 text-2xl font-bold">{`@${user.username}`}</div>
         <div className="w-full border-b border-slate-700 pb-4"></div>
+        <ProfileFeed userId={userId} />
       </Layout>
     </>
   );
@@ -39,7 +61,7 @@ import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import Image from "next/image";
 import superjson from "superjson";
 import { Layout } from "~/components/Layout";
-import { LoadSpinner } from "~/components/LoadSpinner";
+import { PostView } from "~/components/PostView";
 import { appRouter } from "~/server/api/root";
 import { prisma } from "~/server/db";
 

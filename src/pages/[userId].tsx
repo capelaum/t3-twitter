@@ -1,10 +1,14 @@
 import { type GetStaticProps, type NextPage } from "next";
 import Head from "next/head";
+import Image from "next/image";
+import { Layout } from "~/components/Layout";
 import { LoadingPage } from "~/components/LoadSpinner";
+import { PostView } from "~/components/PostView";
+import { generateSSGHelper } from "~/server/helpers/ssgProxyHelper";
 import { api } from "~/utils/api";
 
 const ProfileFeed = (props: { userId: string }) => {
-  const { data, isLoading } = api.posts.getPostsByUserId.useQuery({
+  const { data, isLoading } = api.posts.getByUserId.useQuery({
     userId: props.userId,
   });
 
@@ -57,14 +61,6 @@ const ProfilePage: NextPage<{ userId: string }> = ({ userId }) => {
   );
 };
 
-import { createProxySSGHelpers } from "@trpc/react-query/ssg";
-import Image from "next/image";
-import superjson from "superjson";
-import { Layout } from "~/components/Layout";
-import { PostView } from "~/components/PostView";
-import { appRouter } from "~/server/api/root";
-import { prisma } from "~/server/db";
-
 export const getStaticPaths = () => {
   return {
     paths: [],
@@ -73,14 +69,7 @@ export const getStaticPaths = () => {
 };
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
-  const ssg = createProxySSGHelpers({
-    router: appRouter,
-    ctx: {
-      prisma,
-      userId: null,
-    },
-    transformer: superjson, // optional - adds superjson serialization
-  });
+  const ssg = generateSSGHelper();
 
   const userId = ctx.params?.userId;
 

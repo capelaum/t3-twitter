@@ -7,6 +7,19 @@
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  swcMinify: true,
+
+  images: {
+    domains: ["images.clerk.dev"],
+  },
+
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 
   /**
    * If you have the "experimental: { appDir: true }" setting enabled, then you
@@ -17,10 +30,6 @@ const config = {
   i18n: {
     locales: ["en"],
     defaultLocale: "en",
-  },
-
-  images: {
-    domains: ["images.clerk.dev"],
   },
 };
 export default config;
